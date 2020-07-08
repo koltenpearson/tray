@@ -313,11 +313,13 @@ public class SystemUtilities {
 
     public static boolean isDarkTaskbar(boolean recheck) {
         if(darkTaskbar == null || recheck) {
-            if (!isWindows()) {
-                // Mac and Linux don't differentiate; return the cached darkDesktop value
-                darkTaskbar = isDarkDesktop();
-            } else {
+            if (isWindows()) {
                 darkTaskbar = WindowsUtilities.isDarkTaskbar();
+            } else if(isMac()) {
+                darkTaskbar = MacUtilities.isDarkTaskbar();
+            } else {
+                // Linux doesn't differentiate; return the cached darkDesktop value
+                darkTaskbar = isDarkDesktop();
             }
         }
         return darkTaskbar.booleanValue();
@@ -331,7 +333,7 @@ public class SystemUtilities {
         if (darkDesktop == null || recheck) {
             // Check for Dark Mode on MacOS
             if (isMac()) {
-                darkDesktop = MacUtilities.isDarkMode();
+                darkDesktop = MacUtilities.isDarkDesktop();
             } else if (isWindows()) {
                 darkDesktop = WindowsUtilities.isDarkDesktop();
             } else {

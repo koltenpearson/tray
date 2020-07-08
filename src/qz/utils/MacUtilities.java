@@ -21,6 +21,7 @@ import qz.common.TrayManager;
 import qz.ui.component.IconCache;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -107,8 +108,21 @@ public class MacUtilities {
      * Runs a shell command to determine if "Dark" desktop theme is enabled
      * @return true if enabled, false if not
      */
-    public static boolean isDarkMode() {
+    public static boolean isDarkDesktop() {
         return !ShellUtilities.execute(new String[] { "defaults", "read", "-g", "AppleInterfaceStyle" }, new String[] { "Dark" }, true, true).isEmpty();
+    }
+
+    public static boolean isDarkTaskbar() {
+        try {
+            Rectangle rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+            Rectangle topCorner = new Rectangle(rectangle.x, rectangle.y, 1, 1);
+            BufferedImage pixel = new Robot().createScreenCapture(topCorner);
+            Color color = new Color(pixel.getRGB(0, 0));
+            return (color.getRed() * 0.299) + (color.getGreen() * 0.587) + (color.getBlue() * 0.114) <= 174;
+        } catch(AWTException e) {
+            log.warn("Unable to detect dark taskbar: {}", e.getMessage());
+        }
+        return false;
     }
 
     public static int getScaleFactor() {
